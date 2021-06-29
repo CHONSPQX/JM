@@ -43,7 +43,7 @@ OBJSUF= .o$(SUFFIX)
 
 SRC=    $(wildcard $(SRCDIR)/*.cpp) 
 OBJ=    $(SRC:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o$(SUFFIX)) 
-BIN=    $(BINDIR)/$(NAME)$(SUFFIX).exe
+BIN=    $(BINDIR)/$(NAME)$(SUFFIX)
 
 .PHONY: default distclean clean tags depend
 

@@ -728,6 +728,62 @@ void init_slice(VideoParameters *p_Vid, Slice *currSlice)
     currSlice->linfo_cbp_intra = linfo_cbp_intra_normal;
     currSlice->linfo_cbp_inter = linfo_cbp_inter_normal;
   }
+
+#if QIAOXIN_DE
+  char * sliceinfo []=  {"P_SLICE","B_SLICE","I_SLICE","SP_SLICE","SI_SLICE", "NUM_SLICE_TYPES" } ;
+  printf("SL{'TYPE':'%s','POC':%d",sliceinfo[currSlice->slice_type], currSlice->framepoc);
+  switch (currSlice->slice_type) {
+  case I_SLICE:
+  case SI_SLICE:
+          break;
+  case P_SLICE:
+  case SP_SLICE:
+          printf(",'List0':[");
+          for (int ref = 0; ref < currSlice->listXsize[LIST_0]; ref++)
+          {
+                  printf("(%d,%d)", currSlice->listX[LIST_0][ref]->pic_num, currSlice->listX[LIST_0][ref]->poc);
+                  if (ref + 1 < currSlice->listXsize[LIST_0])
+                          printf(",");
+                  else printf("]");
+          }
+          break;
+  case B_SLICE:
+          printf(",'List0':[");
+          for (int ref = 0; ref < currSlice->listXsize[LIST_0]; ref++)
+          {
+                  printf("(%d,%d)", currSlice->listX[LIST_0][ref]->pic_num, currSlice->listX[LIST_0][ref]->poc);
+                  if (ref + 1 < currSlice->listXsize[LIST_0])
+                          printf(",");
+                  else printf("]");
+          }
+          printf(",'List1':[");
+          for (int ref = 0; ref < currSlice->listXsize[LIST_1]; ref++)
+          {
+                  printf("(%d,%d)", currSlice->listX[LIST_1][ref]->pic_num, currSlice->listX[LIST_1][ref]->poc);
+                  if (ref + 1 < currSlice->listXsize[LIST_1])
+                          printf(",");
+                  else printf("]");
+          }
+          break;
+  default:
+          break;
+  }
+  /*
+  for (int list = LIST_0; list <= LIST_1; list++)
+  {
+          if (list == 0)  printf("'List0':[");  else printf("'List1':[");
+          for (int ref = 0; ref < currSlice->listXsize[list]; ref++)
+          {
+                  printf("(%d,%d)", currSlice->listX[list][ref]->pic_num, currSlice->listX[list][ref]->poc);
+                  if (ref -1 < currSlice->listXsize[list])
+                          printf(",");
+                  else printf("]");
+          }
+          if (list == 0) printf("],"); else printf("]");
+  }
+  */
+  printf("}\n");
+#endif
 }
 
 void decode_slice(Slice *currSlice, int current_header)

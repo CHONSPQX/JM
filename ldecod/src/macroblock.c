@@ -7,7 +7,7 @@
  *
  * \author
  *    Main contributors (see contributors.h for copyright, address and affiliation details)
- *    - Inge Lille-Langøy               <inge.lille-langoy@telenor.com>
+ *    - Inge Lille-Lang?               <inge.lille-langoy@telenor.com>
  *    - Rickard Sjoberg                 <rickard.sjoberg@era.ericsson.se>
  *    - Jani Lainema                    <jani.lainema@nokia.com>
  *    - Sebastian Purreiter             <sebastian.purreiter@mch.siemens.de>
@@ -1429,7 +1429,93 @@ int decode_one_macroblock(Macroblock *currMB, StorablePicture *dec_picture)
   {
     currSlice->decode_one_component(currMB, PLANE_Y, dec_picture->imgY, dec_picture);
   }
-
+#if QIAOXIN_DE
+  int slice_type = currMB->p_Slice->slice_type;
+  char* info[] = { "PSKIP" ,"P16x16",	"P16x8" ,	"P8x16" ,	"SMB8x8","SMB8x4","SMB4x8","SMB4x4","P8x8","I4MB","I16MB","IBLOCK","SI4MB" ,"I8MB" ,"IPCM" ,"MAXMODE" };
+  switch (currMB->mb_type) {
+  case 0:
+  case 1:
+  case 2:
+  case 3:
+  case 8:
+          printf("MB{'%s':(%d,%d,%d),'QP':%d", info[currMB->mb_type], currMB->mbAddrX,currMB->block_y/4,currMB->block_x/4,currMB->qp);
+          PicMotionParams** mv_info = currMB->p_Slice->dec_picture->mv_info;
+          if (slice_type == P_SLICE|| slice_type==SP_SLICE) {
+                  printf(",'R0':[");
+                  for (int j = currMB->block_y; j < currMB->block_y + BLOCK_SIZE; ++j)
+                  {
+                          for (int i = currMB->block_x; i < currMB->block_x + BLOCK_SIZE; ++i)
+                          {
+                                  printf("(%d,%d)", mv_info[j][i].ref_idx[LIST_0], mv_info[j][i].ref_pic[LIST_0]->poc);
+                                  if (j + 1 < currMB->block_y + BLOCK_SIZE|| i+1 < currMB->block_x + BLOCK_SIZE) printf(",");
+                                  else printf("]");
+                          }
+                  }
+                  printf(",'M0':[");
+                  for (int j = currMB->block_y; j < currMB->block_y + BLOCK_SIZE; ++j)
+                  {
+                          for (int i = currMB->block_x; i < currMB->block_x + BLOCK_SIZE; ++i)
+                          {
+                                  printf("(%d,%d)", mv_info[j][i].mv[LIST_0].mv_y, mv_info[j][i].mv[LIST_0].mv_x);
+                                  if (j + 1 < currMB->block_y + BLOCK_SIZE || i + 1 < currMB->block_x + BLOCK_SIZE) printf(",");
+                                  else printf("]");
+                          }
+                  }
+          }
+          else {
+                  printf(",'R0':[");
+                  for (int j = currMB->block_y; j < currMB->block_y + BLOCK_SIZE; ++j)
+                  {
+                          for (int i = currMB->block_x; i < currMB->block_x + BLOCK_SIZE; ++i)
+                          {
+                                  if (mv_info[j][i].ref_pic[LIST_0])
+                                          printf("(%d,%d)", mv_info[j][i].ref_idx[LIST_0], mv_info[j][i].ref_pic[LIST_0]->poc);
+                                  else
+                                          printf("(%d,None)", mv_info[j][i].ref_idx[LIST_0]);
+                                  if (j + 1 < currMB->block_y + BLOCK_SIZE || i + 1 < currMB->block_x + BLOCK_SIZE) printf(",");
+                                  else printf("]");
+                          }
+                  }
+                  printf(",'R1':[");
+                  for (int j = currMB->block_y; j < currMB->block_y + BLOCK_SIZE; ++j)
+                  {
+                          for (int i = currMB->block_x; i < currMB->block_x + BLOCK_SIZE; ++i)
+                          {
+                                  if (mv_info[j][i].ref_pic[LIST_1])
+                                          printf("(%d,%d)", mv_info[j][i].ref_idx[LIST_1], mv_info[j][i].ref_pic[LIST_1]->poc);
+                                  else
+                                          printf("(%d,None)", mv_info[j][i].ref_idx[LIST_1]);
+                                  if (j + 1 < currMB->block_y + BLOCK_SIZE || i + 1 < currMB->block_x + BLOCK_SIZE) printf(",");
+                                  else printf("]");
+                          }
+                  }
+                  printf(",'M0':[");
+                  for (int j = currMB->block_y; j < currMB->block_y + BLOCK_SIZE; ++j)
+                  {
+                          for (int i = currMB->block_x; i < currMB->block_x + BLOCK_SIZE; ++i)
+                          {
+                                  printf("(%d,%d)", mv_info[j][i].mv[LIST_0].mv_y, mv_info[j][i].mv[LIST_0].mv_x);
+                                  if (j + 1 < currMB->block_y + BLOCK_SIZE || i + 1 < currMB->block_x + BLOCK_SIZE) printf(",");
+                                  else printf("]");
+                          }
+                  }
+                  printf(",'M1':[");
+                  for (int j = currMB->block_y; j < currMB->block_y + BLOCK_SIZE; ++j)
+                  {
+                          for (int i = currMB->block_x; i < currMB->block_x + BLOCK_SIZE; ++i)
+                          {
+                                  printf("(%d,%d)", mv_info[j][i].mv[LIST_1].mv_y, mv_info[j][i].mv[LIST_1].mv_x);
+                                  if (j + 1 < currMB->block_y + BLOCK_SIZE || i + 1 < currMB->block_x + BLOCK_SIZE) printf(",");
+                                  else printf("]");
+                          }
+                  }
+          }
+          printf("}\n");
+          break;
+  default:
+          printf("MB{'%s':(%d,%d,%d),'QP':%d}\n", info[currMB->mb_type], currMB->mbAddrX, currMB->block_y / 4, currMB->block_x / 4, currMB->qp);
+  }
+#endif
   return 0;
 }
 

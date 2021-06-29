@@ -68,7 +68,7 @@ OBJSUF= .o$(SUFFIX)
 SRC=    $(wildcard $(SRCDIR)/*.c) 
 ADDSRC= $(wildcard $(ADDSRCDIR)/*.c)
 OBJ=    $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o$(SUFFIX)) $(ADDSRC:$(ADDSRCDIR)/%.c=$(OBJDIR)/%.o$(SUFFIX)) 
-BIN=    $(BINDIR)/$(NAME)$(SUFFIX).exe
+BIN=    $(BINDIR)/$(NAME)$(SUFFIX)
 
 .PHONY: default distclean clean tags depend
 
